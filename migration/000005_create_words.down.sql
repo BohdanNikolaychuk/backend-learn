@@ -1,0 +1,1 @@
+drop table learn_backend.words;
