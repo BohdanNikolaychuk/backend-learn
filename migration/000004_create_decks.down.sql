@@ -1,0 +1,1 @@
+table drop learn_backend.decks;
