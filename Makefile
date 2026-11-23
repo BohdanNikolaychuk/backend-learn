@@ -33,3 +33,7 @@ migrate-up:
 
 migrate-down:
 	$(MIGRATE) down 1
+
+
+project-start:
+	@go run cmd/learn-backend/main.go
