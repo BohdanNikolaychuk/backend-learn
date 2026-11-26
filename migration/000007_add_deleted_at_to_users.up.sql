@@ -1,2 +1,2 @@
 ALTER TABLE learn_backend.users
-DROP COLUMN deleted_at;
+ADD COLUMN deleted_at TIMESTAMPTZ;

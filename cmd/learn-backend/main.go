@@ -39,6 +39,10 @@ func main() {
 
 	http.HandleFunc("DELETE /user/{id}", userTransport.DeleteByID)
 
+	http.HandleFunc("PATCH /user/{id}", userTransport.Update)
+
+	http.HandleFunc("PATCH /user/{id}/password", userTransport.ChangePassword)
+
 	http.ListenAndServe(fmt.Sprintf(":%s", conf.ServerPort), nil)
 
 }

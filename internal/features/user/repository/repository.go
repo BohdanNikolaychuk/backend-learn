@@ -105,3 +105,18 @@ func (r *UserRepository) Update(ctx context.Context, id string, req dto.UpdateUs
 
 	return user, err
 }
+
+func (r *UserRepository) ChangePassword(ctx context.Context, id string, newPasswordHash string) error {
+	query := `UPDATE learn_backend.users
+              SET password = $1, updated_at = NOW()
+              WHERE id = $2 AND deleted_at IS NULL`
+
+	tag, err := r.db.Exec(ctx, query, newPasswordHash, id)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return errors.New("user not found")
+	}
+	return nil
+}
