@@ -1,1 +1,1 @@
-table drop learn_backend.decks;
+DROP TABLE IF EXISTS learn_backend.decks CASCADE;
