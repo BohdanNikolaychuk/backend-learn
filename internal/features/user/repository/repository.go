@@ -120,3 +120,28 @@ func (r *UserRepository) ChangePassword(ctx context.Context, id string, newPassw
 	}
 	return nil
 }
+
+func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+	query := `SELECT id, version, email, password, full_name, created_at, updated_at 
+			  FROM learn_backend.users
+				WHERE email = $1 AND deleted_at IS NULL
+				`
+
+	user := &model.User{}
+
+	err := r.db.QueryRow(ctx, query, email).Scan(
+		&user.ID,
+		&user.Version,
+		&user.Email,
+		&user.Password,
+		&user.FullName,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, errors.New("user not found")
+	}
+
+	return user, err
+}
