@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS learn_backend.refresh_tokens;
