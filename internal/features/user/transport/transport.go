@@ -113,3 +113,28 @@ func (t *UserTransport) Update(w http.ResponseWriter, r *http.Request) {
 
 	tools.WriteJSON(w, http.StatusOK, resp)
 }
+
+func (t *UserTransport) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+
+	if id == "" {
+		tools.WriteError(w, http.StatusBadRequest, "invalid id")
+		return
+	}
+
+	var req dto.ChangePasswordUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		tools.WriteError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err := t.service.ChangePassword(r.Context(), id, req)
+
+	if err != nil {
+		tools.WriteError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+
+}
