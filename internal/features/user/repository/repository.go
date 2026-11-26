@@ -2,9 +2,11 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/BohdanNikolaychuk/backend-learn/internal/features/user/dto"
 	"github.com/BohdanNikolaychuk/backend-learn/internal/features/user/model"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -29,6 +31,77 @@ func (r *UserRepository) Create(ctx context.Context, req dto.CreateUserRequest) 
 		&user.FullName,
 		&user.CreatedAt,
 		&user.UpdatedAt)
+
+	return user, err
+}
+
+func (r *UserRepository) GetByID(ctx context.Context, id string) (*model.User, error) {
+	query := `SELECT id, version, email, password, full_name, created_at, updated_at 
+			  FROM learn_backend.users
+				WHERE id = $1 AND deleted_at IS NULL
+				`
+	user := &model.User{}
+
+	err := r.db.QueryRow(ctx, query, id).Scan(&user.ID,
+		&user.Version,
+		&user.Email,
+		&user.Password,
+		&user.FullName,
+		&user.CreatedAt,
+		&user.UpdatedAt)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, errors.New("user not found")
+	}
+
+	return user, err
+}
+
+func (r *UserRepository) DeleteByID(ctx context.Context, id string) (*model.User, error) {
+	query := `UPDATE learn_backend.users
+			  SET deleted_at = NOW()
+			  WHERE id = $1 AND deleted_at IS NULL
+			  RETURNING id, version, email, password, full_name, created_at, updated_at, deleted_at`
+	user := &model.User{}
+
+	err := r.db.QueryRow(ctx, query, id).Scan(&user.ID,
+		&user.Version,
+		&user.Email,
+		&user.Password,
+		&user.FullName,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&user.DeletedAt,
+	)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, errors.New("user not found")
+	}
+
+	return user, err
+}
+
+func (r *UserRepository) Update(ctx context.Context, id string, req dto.UpdateUserRequest) (*model.User, error) {
+	query := `UPDATE learn_backend.users
+              SET full_name = COALESCE(NULLIF($1, ''), full_name),
+                  updated_at = NOW()
+              WHERE id = $2 AND deleted_at IS NULL
+              RETURNING id, version, email, password, full_name, created_at, updated_at`
+	user := &model.User{}
+
+	err := r.db.QueryRow(ctx, query, req.FullName, id).Scan(
+		&user.ID,
+		&user.Version,
+		&user.Email,
+		&user.Password,
+		&user.FullName,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, errors.New("user not found")
+	}
 
 	return user, err
 }

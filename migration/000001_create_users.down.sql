@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS learn_backend.users CASCADE;
+DROP SCHEMA IF EXISTS learn_backend CASCADE;

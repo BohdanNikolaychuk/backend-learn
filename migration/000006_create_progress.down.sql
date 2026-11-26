@@ -1,1 +1,1 @@
-DROP TABLE learn_backend.progress;
+DROP TABLE IF EXISTS learn_backend.progress CASCADE;

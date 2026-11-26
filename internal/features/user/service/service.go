@@ -2,18 +2,25 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/BohdanNikolaychuk/backend-learn/internal/features/user/dto"
 	"github.com/BohdanNikolaychuk/backend-learn/internal/features/user/model"
-	"github.com/BohdanNikolaychuk/backend-learn/internal/features/user/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserService struct {
-	repo *repository.UserRepository
+type UserRepository interface {
+	Create(ctx context.Context, req dto.CreateUserRequest) (*model.User, error)
+	GetByID(ctx context.Context, id string) (*model.User, error)
+	DeleteByID(ctx context.Context, id string) (*model.User, error)
+	Update(ctx context.Context, id string, dto dto.UpdateUserRequest) (*model.User, error)
 }
 
-func NewUserService(repo *repository.UserRepository) *UserService {
+type UserService struct {
+	repo UserRepository
+}
+
+func NewUserService(repo UserRepository) *UserService {
 	return &UserService{repo: repo}
 }
 
@@ -26,4 +33,30 @@ func (s *UserService) Create(ctx context.Context, dto dto.CreateUserRequest) (*m
 	dto.Password = string(hashedPass)
 
 	return s.repo.Create(ctx, dto)
+}
+
+func (s *UserService) GetByID(ctx context.Context, id string) (*model.User, error) {
+	if id == "" {
+		return nil, errors.New("invalid id")
+	}
+	return s.repo.GetByID(ctx, id)
+}
+
+func (s *UserService) DeleteByID(ctx context.Context, id string) (*model.User, error) {
+	if id == "" {
+		return nil, errors.New("invalid id")
+	}
+	return s.repo.DeleteByID(ctx, id)
+}
+
+func (s *UserService) Update(ctx context.Context, id string, dto dto.UpdateUserRequest) (*model.User, error) {
+	if id == "" {
+		return nil, errors.New("invalid id")
+	}
+
+	if dto.FullName == "" {
+		return nil, errors.New("nothing to update")
+	}
+
+	return s.repo.Update(ctx, id, dto)
 }

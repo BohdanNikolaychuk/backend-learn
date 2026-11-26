@@ -1,14 +1,14 @@
 CREATE TABLE learn_backend.words(
-	id BIGSERIAL PRIMARY KEY,
-	deck_id bigint not null REFERENCES learn_backend.decks(id),
-	word varchar(255) not null,
-	transcription varchar(255),
-	part_of_speech varchar(50),
-	translation TEXT not null,
-	definition TEXT,
-	example TEXT,
-	example_translation TEXT,
-	notes TEXT,
-	level varchar(10),
-	created_at TIMESTAMPTZ not null default now()
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_id             UUID NOT NULL REFERENCES learn_backend.decks(id),
+    word                VARCHAR(255) NOT NULL,
+    transcription       VARCHAR(255),
+    part_of_speech      VARCHAR(50),
+    translation         TEXT NOT NULL,
+    definition          TEXT,
+    example             TEXT,
+    example_translation TEXT,
+    notes               TEXT,
+    level               VARCHAR(10),
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -1,1 +1,1 @@
-drop table learn_backend.words;
+DROP TABLE IF EXISTS learn_backend.words CASCADE;

@@ -35,6 +35,10 @@ func main() {
 
 	http.HandleFunc("POST /user", userTransport.Create)
 
+	http.HandleFunc("GET /user/{id}", userTransport.GetByID)
+
+	http.HandleFunc("DELETE /user/{id}", userTransport.DeleteByID)
+
 	http.ListenAndServe(fmt.Sprintf(":%s", conf.ServerPort), nil)
 
 }
